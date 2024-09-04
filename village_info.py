@@ -6,7 +6,7 @@ class village_info:
 
     def __init__(self,path,vname):
         self.gdp_path = path
-        self.layers = fiona.listlayers(self.gdb_path)
+        self.layers = fiona.listlayers(self.gdp_path)
         self.vname = vname
     
     def house_info(self,lname):
@@ -26,7 +26,7 @@ class village_info:
         return self.layers
 
     def pic_gen(self,lname):
-        self.pic_layer = gpd.read_file(self.gdp_path,layer=self.lname)
+        self.pic_layer = gpd.read_file(self.gdp_path,layer=lname)
         self.pic_layer.plot()
         plt.savefig(f'{self.vname}_{lname}.jpeg')
         return f'{self.vname}_{lname}.jpeg'
