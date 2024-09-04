@@ -74,11 +74,7 @@ if uploaded_file:
                         img_data = io.BytesIO(file.read())
                         img = Image.open(img_data)
                         st.image(img, caption="Updated Map Image")
-                else:
-                    st.write("Image file not found.")
-            else:
-                st.write("No layers selected. Please select at least one layer.")
-        else:
-            st.write("No layers available in the .gdb folder.")
-    else:
-        st.write("No .gdb folder found in the ZIP archive.")
+                else: st.write("Image file not found.")
+            else: st.write("No layers selected. Please select at least one layer.")
+        else: st.write("No layers available in the .gdb folder.")
+    else: st.write("No .gdb folder found in the ZIP archive.")
