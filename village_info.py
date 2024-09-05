@@ -32,11 +32,11 @@ class village_info:
         return f'{self.vname}_{lname}.jpeg'
 
     def pic_gen_multiple(self, layer_names):
-        fig, ax = plt.subplots(figsize=(10, 10)) 
+        fig, ax = plt.subplots(figsize=(12, 12)) 
         
         for lname in layer_names:
             layer = gpd.read_file(self.gdp_path, layer=lname)
-            layer.plot(ax=ax, label=lname)
+            layer.plot(ax=ax, label=lname,figsize=(12,12))
         
         ax.legend()
         combined_filename = f'{self.vname}_combined_layers.jpeg'
