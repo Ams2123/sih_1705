@@ -4,6 +4,7 @@ import zipfile
 import io
 import os
 from PIL import Image
+import plotly.express as px
 
 def extract_zip(file, output_dir):
     """Extract the ZIP file and return a dictionary of file names and their content."""
@@ -63,20 +64,15 @@ if uploaded_file:
                 st.write(village.road_info(selected_layers[0]))
                 # Check if more than one layer is selected
                 if len(selected_layers) > 1:
-                    # Use pic_gen_multiple for multiple layers
-                    combined_image_path = village.pic_gen_multiple(selected_layers)
+                    fig = village.graph_gen_multiple(selected_layers)
+                    st.plotly_chart(fig)
                 else:
                     # Use pic_gen for a single layer
-                    combined_image_path = village.pic_gen(selected_layers[0])
+                    fig = village.graph_gen(selected_layers[0])
+                    st.plotly_chart(fig)
+               
                 
-                # Display the updated map image
-                if os.path.isfile(combined_image_path):
-                    with open(combined_image_path, 'rb') as file:
-                        img_data = io.BytesIO(file.read())
-                        img = Image.open(img_data)
-                        st.image(img, caption="Updated Map Image")
-                else:
-                    st.write("Image file not found.")
+                
             else:
                 st.write("No layers selected. Please select at least one layer.")
         else:

@@ -44,15 +44,20 @@ class village_info:
         plt.close() 
         
         return combined_filename
+
 class property_tax:
+    
     def __init__(self,tax_rate_per_sqm=None,capital_value_rate=None,rental_value_rate=None):
         self.tax_rate_per_sqm = tax_rate_per_sqm
         self.capital_value_rate = capital_value_rate
         self.rental_value_rate = rental_value_rate
+    
     def uav_system(self, area):
         return area * self.tax_rate_per_sqm
+    
     def cvs_system(self, capital_value):
         return capital_value * self.capital_value_rate
+    
     def arv_system(self, rental_value):
         return rental_value * self.rental_value_rate
 
