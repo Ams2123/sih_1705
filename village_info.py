@@ -1,10 +1,11 @@
 import fiona
 import geopandas as gpd 
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
-class village_info:
+class village_map_gen:
 
-    def __init__(self,path,vname):
+    def __init__(self,path,vname="State"):
         self.gdp_path = path
         self.layers = fiona.listlayers(self.gdp_path)
         self.vname = vname
@@ -25,26 +26,54 @@ class village_info:
     def layers_available(self):
         return self.layers
 
-    def pic_gen(self,lname):
-        self.pic_layer = gpd.read_file(self.gdp_path,layer=lname)
-        self.pic_layer.plot()
-        plt.savefig(f'{self.vname}_{lname}.jpeg')
-        return f'{self.vname}_{lname}.jpeg'
+    def graph_gen(self,lname):
+        traces = self.trace_gen(lname)
+        fig = go.Figure(data=traces,)
+        fig.update_layout(title="Map",xaxis_title = "Longitude",yaxis_title = "Latitude",width = 600,height = 600)
+        return fig
 
-    def pic_gen_multiple(self, layer_names):
-        fig, ax = plt.subplots(figsize=(12, 12)) 
+    def graph_gen_multiple(self, layer_names):
+        traces = []
+        for i in layer_names:
+            print(i)
+            traces += self.trace_gen(i)
+        fig = go.Figure(data=traces,)
+        fig.update_layout(title="Map",xaxis_title = "Longitude",yaxis_title = "Latitude",width = 600,height = 600)
+        return fig
+    
+    def color(self,lname):
+        self.colour_code = {"area":"rgba(206,114,60,100)","road":"rgba(255,255,255,80)","water":"rgba(124,220,254,100)",\
+                       "railway":"rgba(255, 215,0,100)","other":"rgba(78,201,176,100)"}
+        lname=lname.split("_")
+        for i in lname : 
+            try:
+                return self.colour_code[i.lower()]
+            except KeyError:
+                continue
+        return self.colour_code["other"]
+    
+    def trace_gen(self,lname):
+        self.layer = gpd.read_file(self.gdp_path,layer=lname)
+        polygons = self.layer["geometry"] 
+        traces = []
+        for geom in polygons:
+            if geom.is_empty:
+                continue
+            if geom.geom_type == "Polygon":
+                x,y = geom.exterior.xy
+                x,y = list(x)[-1],list(y)[-1]
+                traces.append(go.Scatter(x=x,y=y,mode="lines+fill",fill="toself",\
+                                         line=dict(width=0.1),fillcolor=self.color(lname),
+                                         showlegend=False))
+            else :
+                for polygon in geom.geoms:
+                    x,y = polygon.exterior.xy
+                    x,y = list(x),list(y)
+                    traces.append(go.Scatter(x=x,y=y,mode="lines",fill="toself",\
+                                         line=dict(width=0.1),fillcolor=self.color(lname),\
+                                         showlegend = False))
+        return traces
         
-        for lname in layer_names:
-            layer = gpd.read_file(self.gdp_path, layer=lname)
-            layer.plot(ax=ax, label=lname,figsize=(12,12))
-        
-        ax.legend()
-        combined_filename = f'{self.vname}_combined_layers.jpeg'
-        plt.savefig(combined_filename)
-        plt.close() 
-        
-        return combined_filename
-
 class property_tax:
     
     def __init__(self,tax_rate_per_sqm=None,capital_value_rate=None,rental_value_rate=None):
